@@ -126,7 +126,7 @@ uv run document-evidence list
 ```toml
 [mcp_servers.document_evidence]
 command = 'D:\Codexhome\document-evidence-mcp-runtime\Scripts\document-evidence-mcp.exe'
-cwd = 'X:\document-evidence-mcp'
+cwd = 'D:\Codexhome\document-evidence-mcp'
 startup_timeout_sec = 60
 tool_timeout_sec = 1800
 required = false
@@ -135,7 +135,7 @@ required = false
 DOCUMENT_EVIDENCE_STORE = 'D:\Codexhome\document-evidence-store'
 DOCUMENT_EVIDENCE_OCR_PROVIDER = 'paddleocr'
 DOCUMENT_EVIDENCE_OCR_DEVICE = 'gpu:0'
-DOCUMENT_EVIDENCE_ALLOWED_ROOTS = 'X:\document-evidence-mcp\pdf'
+DOCUMENT_EVIDENCE_ALLOWED_ROOTS = 'D:\Codexhome\document-evidence-mcp\pdf'
 PADDLE_PDX_CACHE_HOME = 'D:\Codexhome\models\paddlex'
 PADDLE_OCR_BASE_DIR = 'D:\Codexhome\models\paddleocr'
 PADDLE_PDX_MODEL_SOURCE = 'bos'

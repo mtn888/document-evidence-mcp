@@ -19,12 +19,13 @@ Codex 项目中默认可发现；同时以全局指令、可复用 skill 和生�
 | skill | `D:\Codexhome\skills\document-evidence` | 可显式或隐式触发的取证工作流 |
 | hook 脚本 | `D:\Codexhome\hooks\document-evidence-context.py` | 注入简短的可用性与边界提示 |
 | hook 配置 | `D:\Codexhome\hooks.json` | `SessionStart` 与 `SubagentStart` |
+| 生产工作副本 | `D:\Codexhome\document-evidence-mcp` | 全局 MCP 的代码、文档与运行目录 |
 | 独立运行时 | `D:\Codexhome\document-evidence-mcp-runtime` | Python、Paddle GPU 与 MCP 命令 |
 | 模型缓存 | `D:\Codexhome\models\paddlex` | 已下载的真实 PaddleX/PaddleOCR 模型 |
 | 共享索引 | `D:\Codexhome\document-evidence-store` | 跨项目复用的内容对象、版本与 FTS |
 
-运行时已从通过验收的 wheel 非 editable 安装，导入源码不依赖当前工作目录或
-`X:` 仓库的 `src/`。MCP 进程的 `cwd` 固定为 `D:\Codexhome`。
+运行时从 D 盘生产工作副本非 editable 安装，导入源码不依赖 X 盘开发工作区。
+MCP 进程的 `cwd` 固定为 `D:\Codexhome\document-evidence-mcp`。
 
 ## 用户级 MCP
 
@@ -33,7 +34,7 @@ Codex 项目中默认可发现；同时以全局指令、可复用 skill 和生�
 ```toml
 [mcp_servers.document_evidence]
 command = 'D:\Codexhome\document-evidence-mcp-runtime\Scripts\document-evidence-mcp.exe'
-cwd = 'D:\Codexhome'
+cwd = 'D:\Codexhome\document-evidence-mcp'
 enabled = true
 required = false
 startup_timeout_sec = 60
@@ -77,12 +78,16 @@ hook 在 `startup`、`resume`、`clear`、`compact` 以及子代理启动时注�
 
 ## 实际验证
 
-1. 当前 Codex CLI 可完整解析用户配置；`codex mcp list` 与
+1. D 盘生产工作副本是独立 Git clone，远端为
+   `mtn888/document-evidence-mcp`；运行时 `direct_url.json` 为
+   `file:///D:/Codexhome/document-evidence-mcp`，不再引用 X 盘。
+2. 当前 Codex CLI 可完整解析用户配置；`codex mcp list` 与
    `codex mcp get document_evidence` 均显示服务器为 `enabled`。
-2. hook 脚本用 `SessionStart` 和 `SubagentStart` 两种真实 JSON 输入单独执行，
+   其中 MCP `cwd` 为 `D:\Codexhome\document-evidence-mcp`。
+3. hook 脚本用 `SessionStart` 和 `SubagentStart` 两种真实 JSON 输入单独执行，
    均正常输出简短上下文。
-3. skill 目录通过官方 `quick_validate.py`。
-4. 从与仓库无关的项目目录
+4. skill 目录通过官方 `quick_validate.py`。
+5. 从与仓库无关的项目目录
    `C:\Users\mtn88\Documents\Codex\2026-07-30\wo` 启动全新、ephemeral Codex
    进程，实际调用全局 MCP：
    - `doctor.ocr_available=true`；
@@ -90,6 +95,9 @@ hook 在 `startup`、`resume`、`clear`、`compact` 以及子代理启动时注�
      `doc_7e18839e0c1e01f1_b19168a1f5_r1:e000011`；
    - 命中文本为“第1部分：三元催化转化器”，页码 1；
    - 进程退出码为 0。
+6. 切换 D 盘工作目录后再次从上述无关项目启动全新 Codex，实际调用
+   `doctor` 一次；返回 `ocr_available=true`、
+   `store_root=D:\Codexhome\document-evidence-store`，退出码为 0。
 
 现有已打开任务的工具清单可能是启动时快照；新建任务会读取全局配置。若桌面端
 没有立即刷新 skill 或 MCP，关闭并重新打开 Codex 后生效。
