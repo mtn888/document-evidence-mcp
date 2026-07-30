@@ -19,7 +19,7 @@ if (-not (Test-Path -LiteralPath $python)) {
 }
 
 uv pip install --python $python --link-mode copy $gpuWheel
-uv pip install --python $python --link-mode copy --editable "${projectRoot}[ocr,dev]"
+uv pip install --python $python --link-mode copy "${projectRoot}[ocr,dev]"
 
 $env:DOCUMENT_EVIDENCE_STORE = $StoreRoot
 $env:DOCUMENT_EVIDENCE_ALLOWED_ROOTS = Join-Path $projectRoot 'pdf'

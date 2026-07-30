@@ -120,7 +120,8 @@ uv run document-evidence list
 
 ## 配置 Codex
 
-先完成 `uv sync`，再将以下配置加入用户级 `~/.codex/config.toml`；若只希望当前可信项目使用，也可写入项目的 `.codex/config.toml`。
+先完成安装。以下示例将读取范围限制为本仓库的 `pdf/`，适合写入可信项目的
+`.codex/config.toml`：
 
 ```toml
 [mcp_servers.document_evidence]
@@ -142,6 +143,13 @@ PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK = 'True'
 ```
 
 `DOCUMENT_EVIDENCE_ALLOWED_ROOTS` 使用当前操作系统的路径分隔符；Windows 为分号。项目级配置只会在 Codex 信任该项目后加载。字段依据当前 Codex 配置参考中的 `mcp_servers.<id>.command`、`args`、`cwd`、`env`、启动/工具超时定义：[Codex config.toml reference](https://learn.chatgpt.com/docs/config-file/config-reference#configtoml)。
+
+如需让任意项目默认可用，应把 MCP 写入用户级 `~/.codex/config.toml`，把
+`cwd` 设为稳定的本机目录，并省略 `DOCUMENT_EVIDENCE_ALLOWED_ROOTS`；这表示
+服务端不预先限制可导入根目录，但仍只有显式调用 `ingest_document` 才会读取
+文件。建议同时用用户级 `AGENTS.md`、skill 和轻量 `SessionStart` hook 约束为
+“只导入当前任务相关文档”。本机已验证的完整配置、文件位置、hook 信任与跨项目
+实测见[全局 Codex 集成记录](docs/codex-global-integration.zh-CN.md)。
 
 ## 环境变量
 
