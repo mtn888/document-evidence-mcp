@@ -1,0 +1,64 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "document-evidence-mcp"
+version = "0.1.0"
+description = "A thin, persistent MCP evidence layer for local documents."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "mtn888" }]
+keywords = ["mcp", "documents", "ocr", "evidence", "sqlite"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+  "mcp>=1.28.1,<2",
+  "openpyxl>=3.1.5,<4",
+  "pydantic>=2.11,<3",
+  "pymupdf>=1.26.4,<1.27",
+  "python-docx>=1.2,<2",
+  "python-pptx>=1.0.2,<2",
+]
+
+[project.optional-dependencies]
+ocr = [
+  "paddleocr>=3.2,<4",
+  "paddlex[ocr]>=3.2,<4",
+]
+archive = [
+  "ocrmypdf>=16.10,<17",
+]
+dev = [
+  "pytest>=8.4,<9",
+  "pytest-cov>=6.2,<7",
+  "ruff>=0.12,<1",
+]
+
+[project.scripts]
+document-evidence-mcp = "document_evidence_mcp.server:main"
+document-evidence = "document_evidence_mcp.cli:main"
+
+[project.urls]
+Repository = "https://github.com/mtn888/document-evidence-mcp"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/document_evidence_mcp"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
