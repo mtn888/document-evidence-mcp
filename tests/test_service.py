@@ -112,7 +112,7 @@ def test_unsupported_extension_has_actionable_error(
     tmp_path: Path,
     service: DocumentEvidenceService,
 ) -> None:
-    source = tmp_path / "legacy.doc"
+    source = tmp_path / "legacy.wps"
     source.write_bytes(b"legacy")
 
     with pytest.raises(ValueError, match="unsupported document extension"):

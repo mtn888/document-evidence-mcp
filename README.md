@@ -5,7 +5,7 @@
 它刻意保持“薄”：
 
 - 不重写 PDF、OOXML、OCR 或表格识别引擎；
-- 原生 PDF、DOCX、XLSX、PPTX 优先读取结构，不做无意义 OCR；
+- 原生 PDF、DOCX、XLSX、PPTX 优先读取结构，不做无意义 OCR；Windows 上的旧版 DOC 先经 Microsoft Word 安全转换为临时 DOCX；
 - 扫描 PDF 与图片可选接入 PaddleOCR PP-StructureV3；
 - 源文件按 SHA-256 内容寻址，换路径不重复解析；
 - SQLite FTS 默认使用 trigram tokenizer，兼顾中文、英文和德文检索；
@@ -29,6 +29,7 @@
 支持格式：
 
 - PDF：PyMuPDF 原生文本、表格、页码与 PDF point bbox；
+- DOC：仅 Windows；需要已安装 Microsoft Word，经隐藏的 COM 会话禁用宏并只读转换为临时 DOCX，源文件不变；
 - DOCX：段落、标题样式、表格；
 - XLSX/XLSM：工作表、行、单元格地址与公式文本；
 - PPTX：幻灯片文本、表格与 shape bbox；
@@ -45,6 +46,12 @@ Set-Location document-evidence-mcp
 uv sync --extra dev
 uv run document-evidence doctor
 ```
+
+旧版 `.doc` 另需 Windows、Windows PowerShell 5.1 和本机 Microsoft Word；
+`doctor` 会在平台或 Word COM 注册缺失时给出警告。转换后的临时 `.docx`
+在首次结构解析成功后会原子保存到源 SHA-256 对象目录，并按转换器版本命名；
+后续强制重建或解析配置变化时直接复用，只有缓存缺失、损坏或转换器版本升级才
+重新调用 Word。源 `.doc` 始终保留且不会被改写。
 
 如果仓库位于 Windows UNC/网络映射盘，而 `doctor` 报告 PyMuPDF 原生扩展无法加载，请把虚拟环境放到本机磁盘（项目代码仍可留在网络盘）：
 
@@ -162,6 +169,7 @@ PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK = 'True'
 | `DOCUMENT_EVIDENCE_MAX_FILE_BYTES` | `1073741824` | 单文件上限 |
 | `DOCUMENT_EVIDENCE_CHUNK_CHARS` | `1600` | 单证据块目标上限 |
 | `DOCUMENT_EVIDENCE_CHUNK_OVERLAP` | `160` | 文本块重叠 |
+| `DOCUMENT_EVIDENCE_DOC_CONVERSION_TIMEOUT_SECONDS` | `300` | Microsoft Word 转换单个 DOC 的超时秒数 |
 | `DOCUMENT_EVIDENCE_MAX_SEARCH_CHARS` | `12000` | 单次 MCP 响应正文硬上限 |
 | `DOCUMENT_EVIDENCE_MAX_SEARCH_HITS` | `20` | 单次证据条数硬上限 |
 | `PADDLE_PDX_CACHE_HOME` | `%USERPROFILE%\.paddlex` | PP-StructureV3/PaddleX 模型缓存根目录 |

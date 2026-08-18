@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from document_evidence_mcp.parsers.base import DocumentParser
+from document_evidence_mcp.parsers.doc import DocParser
 from document_evidence_mcp.parsers.docx import DocxParser
 from document_evidence_mcp.parsers.image import ImageParser
 from document_evidence_mcp.parsers.pdf import PdfParser
@@ -19,6 +20,7 @@ class ParserRouter:
     def __init__(self) -> None:
         parsers: list[DocumentParser] = [
             PdfParser(),
+            DocParser(),
             DocxParser(),
             XlsxParser(),
             PptxParser(),

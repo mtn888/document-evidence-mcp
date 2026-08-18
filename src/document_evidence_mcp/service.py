@@ -125,7 +125,9 @@ class DocumentEvidenceService:
         parser = self.router.parser_for(source)
         source_sha256 = sha256_file(source)
         profile, profile_hash = self._profile(parser, options)
-        identity = f"{source_sha256}:{profile_hash}"
+        shared_cache_key = getattr(parser, "shared_cache_key", None)
+        lock_scope = f"shared:{shared_cache_key}" if shared_cache_key else f"profile:{profile_hash}"
+        identity = f"{source_sha256}:{lock_scope}"
         owner = self.store.acquire_ingestion_lock(identity)
         try:
             cached = self.store.find_cached(source_sha256, profile_hash)

@@ -16,6 +16,7 @@ def settings(tmp_path: Path) -> Settings:
         max_file_bytes=10 * 1024 * 1024,
         chunk_chars=320,
         chunk_overlap=40,
+        doc_conversion_timeout_seconds=60,
         max_search_chars=1_200,
         max_search_hits=10,
         ocr_provider="none",

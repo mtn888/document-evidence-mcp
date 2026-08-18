@@ -17,6 +17,7 @@
   → SHA-256 内容对象
   → 原生解析器路由
       PDF       → PyMuPDF
+      DOC       → Microsoft Word COM → 临时 DOCX → python-docx
       DOCX      → python-docx
       XLSX      → openpyxl
       PPTX      → python-pptx
@@ -27,7 +28,7 @@
   → 必要时 PDF bbox 局部渲染
 ```
 
-原生结构优先是硬约束。DOCX/XLSX/PPTX 不会先转图片，带可靠文本层的 PDF 也不会默认 OCR。PDF 单页原生文本少于阈值时，`ocr_mode=auto` 才路由到 OCR。
+原生结构优先是硬约束。DOCX/XLSX/PPTX 不会先转图片，带可靠文本层的 PDF 也不会默认 OCR。旧版二进制 DOC 在 Windows 上通过本机 Microsoft Word COM 只读转换成工作目录内的临时 DOCX，再复用 DOCX 结构解析器；首次解析成功后，转换结果会原子提升为源内容对象旁的版本化衍生缓存，后续重解析不再启动 Word。源 DOC 不会改写。PDF 单页原生文本少于阈值时，`ocr_mode=auto` 才路由到 OCR。
 
 ## 内容与版本身份
 
@@ -52,7 +53,8 @@ PaddleOCR 从“未安装”变为具体版本时，OCR provider version 会变�
 <store>/
   index.sqlite
   objects/
-    ab/<full-sha256>/source.pdf
+    ab/<full-sha256>/source.<原扩展名>
+                     derived-word-com-v1.docx  # 仅旧版 DOC
   versions/
     doc_<sha>_<profile>_r1/
       manifest.json
@@ -60,7 +62,7 @@ PaddleOCR 从“未安装”变为具体版本时，OCR provider version 会变�
       crops/
 ```
 
-- `objects` 保存不可变源文件副本，使检索和裁剪不依赖原路径继续存在。
+- `objects` 保存不可变源文件副本，使检索和裁剪不依赖原路径继续存在；旧版 DOC 的已验证 DOCX 转换结果按转换器版本作为可再生衍生缓存保存在同一内容目录。
 - `versions` 保存可检查、可迁移的文本 artifact。
 - `index.sqlite` 是在线查询路径；SQLite WAL 支持多个本地 MCP 进程并行读。
 - `ingestion_locks` 防止两个进程同时解析相同 SHA/profile；过期锁可回收。
@@ -136,6 +138,8 @@ OCRmyPDF 的角色是可搜索 PDF 归档，不是索引事实源；因此首版
 - 原始内容只保存在本地 store；服务器不需要外网。
 - OCR 模型下载、许可证和推理数据边界由所选 Paddle 运行环境负责。
 - 解析失败不会写入 SQLite 文档记录；内容对象可能已安全去重保存。
+- DOC 转换只在实际导入 `.doc` 时启动隐藏的 Word COM 会话；转换前强制禁用宏，且依赖 Windows PowerShell 5.1、Microsoft Word 和有效的 Word COM 注册。非 Windows 或缺少 Word 时，`doctor` 会报告解析器诊断，导入返回可操作错误。
+- DOC 首次转换按“源 SHA-256 + 转换器版本”共享导入锁，避免不同解析 profile 并发重复启动 Word；单次转换默认 300 秒超时，可用 `DOCUMENT_EVIDENCE_DOC_CONVERSION_TIMEOUT_SECONDS` 调整。
 - PyMuPDF 原生扩展延迟到 PDF 导入/裁剪时加载；单一 PDF 后端故障不会阻止文本或 Office 文档服务启动。Windows 网络盘环境应把虚拟环境放在本机磁盘。
 
 ## 首版非目标与后续方向
@@ -147,7 +151,7 @@ OCRmyPDF 的角色是可搜索 PDF 归档，不是索引事实源；因此首版
 - 手写、公式和印章的统一高精度识别；
 - OCRmyPDF 归档生成；
 - Excel 计算引擎或公式重算；
-- DOC/DOCM/XLS（二进制旧格式）解析；
+- DOCM/XLS 等其他旧版或含宏 Office 格式解析；
 - PDF 证据表格的逐单元格专用 API。
 
 推荐后续顺序：

@@ -48,6 +48,12 @@ class Settings:
     chunk_overlap: int = field(
         default_factory=lambda: _env_int("DOCUMENT_EVIDENCE_CHUNK_OVERLAP", 160)
     )
+    doc_conversion_timeout_seconds: int = field(
+        default_factory=lambda: _env_int(
+            "DOCUMENT_EVIDENCE_DOC_CONVERSION_TIMEOUT_SECONDS",
+            300,
+        )
+    )
     max_search_chars: int = field(
         default_factory=lambda: _env_int("DOCUMENT_EVIDENCE_MAX_SEARCH_CHARS", 12_000)
     )
@@ -85,6 +91,8 @@ class Settings:
             raise ValueError("chunk_chars must be at least 200")
         if self.chunk_overlap < 0 or self.chunk_overlap >= self.chunk_chars:
             raise ValueError("chunk_overlap must be non-negative and less than chunk_chars")
+        if self.doc_conversion_timeout_seconds <= 0:
+            raise ValueError("doc_conversion_timeout_seconds must be positive")
         if self.max_search_chars < 200:
             raise ValueError("max_search_chars must be at least 200")
         if self.max_search_hits < 1:
