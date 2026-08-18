@@ -19,7 +19,7 @@
 
 ## 下一步协调事项
 
-- 用户已于 2026-08-18 授权提交并部署旧版 Word `.doc` 支持；当前正在同步 D 盘生产 clone 与运行时，保留生产 clone 的既有未提交修改。
+- 旧版 Word `.doc` 支持已于 2026-08-18 提交并部署到 D 盘生产 clone/运行时；生产 clone 的既有未提交修改已保留。后续仅需在用户授权时推送远端。
 
 <!-- codex:generated:begin -->
 
@@ -29,7 +29,7 @@
 
 | 对话 ID | 状态 | 工作范围 | 最近更新 | 已验证版本 | 当前进展 |
 |---|---|---|---|---|---|
-| 01a00fd3-47c5-76a0-a7a7-e71ae3dda6a1 | 进行中 | src/document_evidence_mcp; tests; README.md; docs/architecture.zh-CN.md; .env.example; .codex; D:/Codexhome/document-evidence-mcp; D:/Codexhome/document-evidence-mcp-runtime | 2026-08-18T00:00:00+08:00 | 3d2264d3bc8d0dd535d5dea7fdfb4b52d09321ac | 增加 `.doc` 路由、禁用宏的 Word COM 转换、可操作诊断与 300 秒可配置超时。 |
+| 01a00fd3-47c5-76a0-a7a7-e71ae3dda6a1 | 已完成 | src/document_evidence_mcp; tests; README.md; docs/architecture.zh-CN.md; .env.example; .codex; D:/Codexhome/document-evidence-mcp; D:/Codexhome/document-evidence-mcp-runtime | 2026-08-18T00:35:00+08:00 | 595077e65c94ec41e8cd907beb340b7d3ff68bc1 | 增加 `.doc` 路由、禁用宏的 Word COM 转换、可操作诊断与 300 秒可配置超时。 |
 
 ## 范围冲突
 
