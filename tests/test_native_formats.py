@@ -149,6 +149,15 @@ def test_doc_conversion_timeout_is_actionable(
         doc_parser._convert_doc_to_docx(source, destination, timeout_seconds=7)
 
 
+def test_doc_conversion_script_does_not_depend_on_optional_os_environment_variable() -> None:
+    script = Path(doc_parser.__file__).with_name("convert_doc_to_docx.ps1").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'if ($env:OS' not in script
+    assert "OSVersion.Platform" in script
+
+
 def test_xlsx_preserves_sheet_rows_and_formula_text(
     tmp_path: Path,
     service: DocumentEvidenceService,

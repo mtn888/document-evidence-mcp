@@ -12,7 +12,12 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
 
-if ($env:OS -ne "Windows_NT") {
+# `$env:OS` is not guaranteed to exist in MCP hosts that deliberately start
+# the server with a minimal environment.  Query the runtime instead of using
+# that optional environment variable; otherwise Windows PowerShell reports a
+# false "requires Windows" failure before Word COM is even attempted.
+$runningOnWindows = [System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT
+if (-not $runningOnWindows) {
     throw "Legacy .doc conversion requires Windows and Microsoft Word."
 }
 

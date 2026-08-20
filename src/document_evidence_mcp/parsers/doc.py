@@ -18,7 +18,7 @@ class DocConversionError(RuntimeError):
 
 
 # Bump this whenever the PowerShell conversion behavior changes so old derivatives are ignored.
-CONVERTER_VERSION = "1"
+CONVERTER_VERSION = "2"
 DERIVED_DOCX_NAME = f"derived-word-com-v{CONVERTER_VERSION}.docx"
 
 
